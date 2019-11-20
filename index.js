@@ -11,6 +11,9 @@ app.use(express.json());
 app.use(cors());
 app.use('/uploads', express.static('uploads'));
 
+//routes
+app.use(require('./src/routes/users'));
+
 app.get('/', (req, res) => {
     res.send('Hello world');
 });
