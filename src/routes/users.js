@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
     // reject a file
-    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' && file.mimetype === 'application/pdf') {
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'application/pdf') {
         cb(null, true);
     } 
     else {
@@ -168,7 +168,7 @@ router.put('/api/users/editCV/:email', (req, res) => {
     upload(req, res, (err) => {
         const { email } = req.params;
         const oldCvPath = req.body.cv;
-        const newCvPath = req.file.path;
+        const newCvPath = req.files.cv[0].filename;
         const query = `
             UPDATE users 
                 SET \`cv\` = ? 
@@ -176,7 +176,7 @@ router.put('/api/users/editCV/:email', (req, res) => {
         `;
         mySqlConnection.query(query, [newCvPath, email], (err, rows, fields) => {
             if(!err) {
-                fs.unlinkSync(oldCvPath); //borramos la imagen anterior, no funciona
+                fs.unlinkSync(oldCvPath); //borramos el documento anterior, no funciona
                 res.status(200); //status: ok
                 res.send('Ok');
             }

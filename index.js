@@ -13,6 +13,7 @@ app.use('/uploads', express.static('uploads'));
 
 //routes
 app.use(require('./src/routes/users'));
+app.use(require('./src/routes/documents'));
 
 app.get('/', (req, res) => {
     res.send('Hello world');
