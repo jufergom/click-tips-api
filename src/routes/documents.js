@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const mySqlConnection = require('../database');
 const multer = require('multer');
-var fs = require('fs');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -76,12 +75,10 @@ router.post('/api/documents', (req, res) => {
             mySqlConnection.query(query, [title, description, source, price, image, 
                 users_email], (error, rows, fields) => {
                 if(!error) {
-                    res.status(200); //status: ok
-                    res.send('Ok');
+                    res.sendStatus(200); //status: ok
                 }
                 else {
-                    res.status(400); //status: bad request
-                    res.send(error);
+                    res.sendStatus(400); //status: bad request
                 }
             });  
         }
@@ -105,22 +102,18 @@ router.put('/api/documents/:id', (req, res) => {
     `;
     mySqlConnection.query(query, [title, description, price, id], (err, rows, fields) => {
         if(!err) {
-            res.status(200); //status: ok
-            res.send('Ok');
+            res.sendStatus(200); //status: ok
         }
         else {
-            res.status(400); //status: bad request
-            res.send(err);
+            res.sendStatus(400); //status: bad request
         }
     }); 
-    res.send(400);
 });
 
 //modify document source
 router.put('/api/documents/editSource/:id', (req, res) => {
     upload(req, res, (err) => {
         const { id } = req.params;
-        const oldSource = req.body.source;
         const newSource = req.files.source[0].filename;
         const query = `
             UPDATE documents 
@@ -129,24 +122,19 @@ router.put('/api/documents/editSource/:id', (req, res) => {
         `;
         mySqlConnection.query(query, [newSource, id], (err, rows, fields) => {
             if(!err) {
-                fs.unlinkSync(oldSource); //borramos la imagen anterior, no funciona
-                res.status(200); //status: ok
-                res.send('Ok');
+                res.sendStatus(200); //status: ok
             }
             else {
-                res.status(400); //status: bad request
-                res.send(error);
+                res.sendStatus(400); //status: bad request
             }
         });
     });
-    
 });
 
 //modify document image
 router.put('/api/documents/editImage/:id', (req, res) => {
     upload(req, res, (err) => {
         const { id } = req.params;
-        const oldImagePath = req.body.image;
         const newImagePath = req.files.image[0].filename;
         const query = `
             UPDATE documents 
@@ -155,13 +143,10 @@ router.put('/api/documents/editImage/:id', (req, res) => {
         `;
         mySqlConnection.query(query, [newImagePath, id], (err, rows, fields) => {
             if(!err) {
-                fs.unlinkSync(oldImagePath); //borramos el documento anterior, no funciona
-                res.status(200); //status: ok
-                res.send('Ok');
+                res.sendStatus(200); //status: ok
             }
             else {
-                res.status(400); //status: bad request
-                res.send(error);
+                res.sendStatus(400); //status: bad request
             }
         });
     });
@@ -172,15 +157,13 @@ router.delete('/api/documents/:id', (req, res) => {
     const { id } = req.params;
     mySqlConnection.query('DELETE FROM documents WHERE id_documents = ?', [id], (error, results, fields) => {
         if(!error) {
-            res.status(200); //status: ok
-            res.send('Ok');
+            res.sendStatus(200); //status: ok
         }
         else {
             res.status(400);
             res.send(error);
         }
     });
-    res.send(400);
 });
 
 module.exports = router;

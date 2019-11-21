@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const mySqlConnection = require('../database');
 const multer = require('multer');
-var fs = require('fs');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -75,8 +74,7 @@ router.post('/api/users', (req, res) => {
             mySqlConnection.query(query, [email, name, password, type, profession, 
                 icon, cv], (error, rows, fields) => {
                 if(!error) {
-                    res.status(200); //status: ok
-                    res.send('Ok');
+                    res.sendStatus(200); //status: ok
                 }
                 else {
                     res.status(400); //status: bad request
@@ -91,18 +89,23 @@ router.post('/api/users', (req, res) => {
 });
 
 //post method for login purposes only
-router.post('api/users/login', (req, res) => {
+router.post('/api/users/login', (req, res) => {
     const { email, password } = req.body;
     const query = `
-        SELECT * FROM users 
+        SELECT password FROM users 
         WHERE email = ? AND password = ?
     `;
     mySqlConnection.query(query, [email, password], (err, rows, fields) => {
-        if(rows.length == 1) {
-            res.sendStatus(200);
+        if(!err) {
+            if(rows.length == 1) {
+                res.sendStatus(200);
+            }
+            else {
+                res.sendStatus(204); //Status: No content
+            }
         }
         else {
-            res.sendStatus(204); //Status: No content
+            res.sendStatus(400); //Status: Bad request
         }
     });
 });
@@ -133,7 +136,6 @@ router.put('/api/users/:email', (req, res) => {
 router.put('/api/users/editIcon/:email', (req, res) => {
     upload(req, res, (err) => {
         const { email } = req.params;
-        const oldIconPath = req.body.icon;
         const newIconPath = req.files.icon[0].filename;
         const query = `
             UPDATE users 
@@ -142,13 +144,10 @@ router.put('/api/users/editIcon/:email', (req, res) => {
         `;
         mySqlConnection.query(query, [newIconPath, email], (err, rows, fields) => {
             if(!err) {
-                fs.unlinkSync(oldIconPath); //borramos la imagen anterior, no funciona
-                res.status(200); //status: ok
-                res.send('Ok');
+                res.sendStatus(200); //status: ok
             }
             else {
-                res.status(400); //status: bad request
-                res.send(error);
+                res.sendStatus(400); //status: bad request
             }
         });
     });
@@ -158,7 +157,6 @@ router.put('/api/users/editIcon/:email', (req, res) => {
 router.put('/api/users/editCV/:email', (req, res) => {
     upload(req, res, (err) => {
         const { email } = req.params;
-        const oldCvPath = req.body.cv;
         const newCvPath = req.files.cv[0].filename;
         const query = `
             UPDATE users 
@@ -167,13 +165,10 @@ router.put('/api/users/editCV/:email', (req, res) => {
         `;
         mySqlConnection.query(query, [newCvPath, email], (err, rows, fields) => {
             if(!err) {
-                fs.unlinkSync(oldCvPath); //borramos el documento anterior, no funciona
-                res.status(200); //status: ok
-                res.send('Ok');
+                res.sendStatus(200); //status: ok
             }
             else {
-                res.status(400); //status: bad request
-                res.send(error);
+                res.sendStatus(400); //status: bad request
             }
         });
     });
