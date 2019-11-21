@@ -90,7 +90,6 @@ router.post('/api/documents', (req, res) => {
             res.send(err);
         }
     });
-    res.send(200);
 });
 
 //modify document without modifying source or image

@@ -43,8 +43,7 @@ router.get('/api/users', (req, res) => {
             res.send(rows);
         }
         else {
-            res.status(400); //Status: Bad request
-            res.send(err);
+            res.sendStatus(400); //Status: Bad request
         }
     });
 });
@@ -86,11 +85,9 @@ router.post('/api/users', (req, res) => {
             });  
         }
         else {
-            res.status(400); //Status: Bad request
-            res.send(err);
+            res.sendStatus(400); //Status: Bad request
         }
     });
-    res.send(200);
 });
 
 //post method for login purposes only
@@ -102,12 +99,10 @@ router.post('api/users/login', (req, res) => {
     `;
     mySqlConnection.query(query, [email, password], (err, rows, fields) => {
         if(rows.length == 1) {
-            res.status(200);
-            res.send('OK');
+            res.sendStatus(200);
         }
         else {
-            res.status(204); //Status: No content
-            res.send('Incorrect username or password');
+            res.sendStatus(204); //Status: No content
         }
     });
 });
@@ -117,24 +112,21 @@ router.put('/api/users/:email', (req, res) => {
     const { name, password, type, profession } = req.body;
     const { email } = req.params;
     const query = `
-        UPDATE users   
+        UPDATE users
             SET \`name\` = ?, 
             \`password\` = ?, 
             \`type\` = ?, 
             \`profession\` = ?  
-        WHERE \`email\` = ?
+        WHERE email = ?
     `;
     mySqlConnection.query(query, [name, password, type, profession, email], (err, rows, fields) => {
         if(!err) {
-            res.status(200); //status: ok
-            res.send('Ok');
+            res.sendStatus(200); //Status: Ok
         }
         else {
-            res.status(400); //status: bad request
-            res.send(err);
+            res.sendStatus(400); //Status: Bad request
         }
     }); 
-    res.send(400);
 });
 
 //modify user icon
@@ -160,7 +152,6 @@ router.put('/api/users/editIcon/:email', (req, res) => {
             }
         });
     });
-    
 });
 
 //modify user cv
@@ -193,15 +184,12 @@ router.delete('/api/users/:email', (req, res) => {
     const { email } = req.params;
     mySqlConnection.query('DELETE FROM users WHERE email = ?', [email], (error, results, fields) => {
         if(!error) {
-            res.status(200); //status: ok
-            res.send('Ok');
+            res.sendStatus(200); //status: ok
         }
         else {
-            res.status(400);
-            res.send(error);
+            res.sendStatus(400); //Status: Bad request
         }
     });
-    res.send(400);
 });
 
 module.exports = router;
