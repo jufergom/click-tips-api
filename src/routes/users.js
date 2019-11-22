@@ -88,6 +88,31 @@ router.post('/api/users', (req, res) => {
     });
 });
 
+//add a user with no profession and no cv
+router.post('/api/users/addparent', (req, res) => {
+    upload(req, res, (err) => {
+        if(!err) {
+            const { email, name, password, type } = req.body;
+            const icon = req.files.icon[0].filename;
+            let query = `INSERT INTO users (\`email\`, \`name\`, \`password\`, 
+                \`type\`, \`icon\`) 
+                VALUES (?, ?, ?, ?, ?)`;
+            mySqlConnection.query(query, [email, name, password, type, icon], (error, rows, fields) => {
+                if(!error) {
+                    res.sendStatus(200); //status: ok
+                }
+                else {
+                    res.status(400); //status: bad request
+                    res.send(error);
+                }
+            });  
+        }
+        else {
+            res.sendStatus(400); //Status: Bad request
+        }
+    });
+});
+
 //post method for login purposes only
 router.post('/api/users/login', (req, res) => {
     const { email, password } = req.body;
