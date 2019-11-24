@@ -8,26 +8,26 @@ const storage = multer.diskStorage({
         cb(null, './uploads/');
     },
     filename: (req, file, cb) => {
-        const now = new Date().toISOString(); 
-        const date = now.replace(/:/g, '-'); 
+        const now = new Date().toISOString();
+        const date = now.replace(/:/g, '-');
         cb(null, date + file.originalname);
     }
 });
 
 const fileFilter = (req, file, cb) => {
     // reject a file
-    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'application/pdf') {
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'application/pdf' || file.mimetype === 'image/jpg') {
         cb(null, true);
-    } 
+    }
     else {
         cb(null, false);
     }
 };
-  
+
 const upload = multer({
     storage: storage,
     limits: {
-      fileSize: 1024 * 1024 * 10
+      fileSize: 1024 * 1024 * 20
     },
     fileFilter: fileFilter
 }).fields([
@@ -68,10 +68,10 @@ router.post('/api/users', (req, res) => {
             const { email, name, password, type, profession } = req.body;
             const icon = req.files.icon[0].filename;
             const cv = req.files.cv[0].filename;
-            let query = `INSERT INTO users (\`email\`, \`name\`, \`password\`, 
-                \`type\`, \`profession\`, \`icon\`, \`cv\`) 
+            let query = `INSERT INTO users (\`email\`, \`name\`, \`password\`,
+                \`type\`, \`profession\`, \`icon\`, \`cv\`)
                 VALUES (?, ?, ?, ?, ?, ?, ?)`;
-            mySqlConnection.query(query, [email, name, password, type, profession, 
+            mySqlConnection.query(query, [email, name, password, type, profession,
                 icon, cv], (error, rows, fields) => {
                 if(!error) {
                     res.sendStatus(200); //status: ok
@@ -80,7 +80,7 @@ router.post('/api/users', (req, res) => {
                     res.status(400); //status: bad request
                     res.send(error);
                 }
-            });  
+            });
         }
         else {
             res.sendStatus(400); //Status: Bad request
@@ -94,8 +94,8 @@ router.post('/api/users/addparent', (req, res) => {
         if(!err) {
             const { email, name, password, type } = req.body;
             const icon = req.files.icon[0].filename;
-            let query = `INSERT INTO users (\`email\`, \`name\`, \`password\`, 
-                \`type\`, \`icon\`) 
+            let query = `INSERT INTO users (\`email\`, \`name\`, \`password\`,
+                \`type\`, \`icon\`)
                 VALUES (?, ?, ?, ?, ?)`;
             mySqlConnection.query(query, [email, name, password, type, icon], (error, rows, fields) => {
                 if(!error) {
@@ -105,7 +105,7 @@ router.post('/api/users/addparent', (req, res) => {
                     res.status(400); //status: bad request
                     res.send(error);
                 }
-            });  
+            });
         }
         else {
             res.sendStatus(400); //Status: Bad request
@@ -117,7 +117,7 @@ router.post('/api/users/addparent', (req, res) => {
 router.post('/api/users/login', (req, res) => {
     const { email, password } = req.body;
     const query = `
-        SELECT password FROM users 
+        SELECT password FROM users
         WHERE email = ? AND password = ?
     `;
     mySqlConnection.query(query, [email, password], (err, rows, fields) => {
@@ -141,10 +141,10 @@ router.put('/api/users/:email', (req, res) => {
     const { email } = req.params;
     const query = `
         UPDATE users
-            SET \`name\` = ?, 
-            \`password\` = ?, 
-            \`type\` = ?, 
-            \`profession\` = ?  
+            SET \`name\` = ?,
+            \`password\` = ?,
+            \`type\` = ?,
+            \`profession\` = ?
         WHERE email = ?
     `;
     mySqlConnection.query(query, [name, password, type, profession, email], (err, rows, fields) => {
@@ -154,7 +154,7 @@ router.put('/api/users/:email', (req, res) => {
         else {
             res.sendStatus(400); //Status: Bad request
         }
-    }); 
+    });
 });
 
 //modify user icon
@@ -163,8 +163,8 @@ router.put('/api/users/editIcon/:email', (req, res) => {
         const { email } = req.params;
         const newIconPath = req.files.icon[0].filename;
         const query = `
-            UPDATE users 
-                SET \`icon\` = ? 
+            UPDATE users
+                SET \`icon\` = ?
             WHERE \`email\` = ?
         `;
         mySqlConnection.query(query, [newIconPath, email], (err, rows, fields) => {
@@ -184,8 +184,8 @@ router.put('/api/users/editCV/:email', (req, res) => {
         const { email } = req.params;
         const newCvPath = req.files.cv[0].filename;
         const query = `
-            UPDATE users 
-                SET \`cv\` = ? 
+            UPDATE users
+                SET \`cv\` = ?
             WHERE \`email\` = ?
         `;
         mySqlConnection.query(query, [newCvPath, email], (err, rows, fields) => {
