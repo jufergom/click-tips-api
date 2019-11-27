@@ -9,7 +9,7 @@ app.set('port', process.env.PORT || 3001);
 
 //middlewares
 app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit:50000}));
 app.use(cors());
 app.use('/uploads', express.static('uploads'));
 
